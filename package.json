@@ -1,0 +1,21 @@
+{
+  "name": "spotify-radio",
+  "version": "1.0.0",
+  "description": "Semana Javascript Expert 6.0",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server/index.js",
+    "live-reload": "nodemon server/index.js"
+  },
+  "engines": {
+    "node": "17"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "nodemon": "^2.0.15"
+  }
+}
