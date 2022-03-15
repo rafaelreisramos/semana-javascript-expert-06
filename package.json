@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node server/index.js",
-    "live-reload": "nodemon server/index.js",
+    "live-reload": "npx nodemon server/index.js",
     "test": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache",
     "test:watch": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache --watchAll",
     "test:coverage": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache --coverage tests/unit"
