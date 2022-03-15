@@ -10,7 +10,7 @@ export default {
   port: process.env.PORT || 3000,
   dir: {
     root: rootDir,
-    public: publicDir,
+    publicDir,
     audio: audioDir,
     songs: join(audioDir, "songs"),
     fx: join(audioDir, "fx"),
@@ -21,5 +21,12 @@ export default {
   },
   location: {
     home: "/home",
+  },
+  constants: {
+    CONTENT_TYPE: {
+      ".html": "text/html",
+      ".css": "text/css",
+      ".js": "text/javascript",
+    },
   },
 }
