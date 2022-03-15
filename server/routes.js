@@ -4,34 +4,32 @@ import { Controller } from "./controller.js"
 
 const controller = new Controller()
 
-async function routes(request, response) {
-  const {
-    location,
-    pages,
-    constants: { CONTENT_TYPE },
-  } = config
-  const { method, url } = request
+const {
+  location,
+  pages,
+  constants: { CONTENT_TYPE },
+} = config
 
-  if (method === "GET" && url === "/") {
+const routes = {
+  ":get": async (_, response) => {
     response.writeHead(302, {
       Location: location.home,
     })
     return response.end()
-  }
+  },
 
-  if (method === "GET" && url === "/home") {
+  "home:get": async (_, response) => {
     const { stream } = await controller.getFileStream(pages.home)
-
     return stream.pipe(response)
-  }
+  },
 
-  if (method === "GET" && url === "/controller") {
+  "controller:get": async (_, response) => {
     const { stream } = await controller.getFileStream(pages.controller)
-
     return stream.pipe(response)
-  }
+  },
 
-  if (method === "GET") {
+  "file:get": async (request, response) => {
+    const { url } = request
     const { stream, type } = await controller.getFileStream(url)
     const contentType = CONTENT_TYPE[type]
     if (contentType) {
@@ -39,12 +37,13 @@ async function routes(request, response) {
         "Content-Type": contentType,
       })
     }
-
     return stream.pipe(response)
-  }
+  },
 
-  response.writeHead(404)
-  return response.end()
+  default: async (_, response) => {
+    response.writeHead(404)
+    return response.end()
+  },
 }
 
 function handleError(error, response) {
@@ -60,7 +59,13 @@ function handleError(error, response) {
 }
 
 export function handler(request, response) {
-  return routes(request, response).catch((error) =>
+  const { method, url } = request
+  let [_, route] = url.split("/")
+  route = route.includes(".") ? `file:${method}` : `${route}:${method}`
+  const routeKey = route.toLowerCase()
+  const routeChosen = routes[routeKey] || routes.default
+
+  return routeChosen(request, response).catch((error) =>
     handleError(error, response)
   )
 }
