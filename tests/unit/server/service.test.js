@@ -10,11 +10,11 @@ describe("#Service", () => {
     const expectedFiletype = ".html"
     const mockFileStream = TestUtil.generateReadableStream(["data"])
 
-    jest.spyOn(fs, "createReadStream").mockReturnValue(mockFileStream)
-    jest.spyOn(fs.promises, "access").mockReturnValue()
+    jest.spyOn(fs, fs.createReadStream.name).mockReturnValue(mockFileStream)
+    jest.spyOn(fs.promises, fs.promises.access.name).mockResolvedValue()
     const stream = await service.getFileStream(filename)
 
-    expect(stream).toEqual({
+    expect(stream).toStrictEqual({
       stream: mockFileStream,
       type: expectedFiletype,
     })

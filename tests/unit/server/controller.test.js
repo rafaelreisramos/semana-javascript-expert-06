@@ -9,7 +9,7 @@ describe("Controller", () => {
 
     jest
       .spyOn(Service.prototype, Service.prototype.getFileStream.name)
-      .mockReturnValue({})
+      .mockResolvedValue({})
     await controller.getFileStream(filename)
 
     expect(Service.prototype.getFileStream).toHaveBeenCalledWith(filename)
