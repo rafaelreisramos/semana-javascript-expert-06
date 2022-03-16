@@ -61,7 +61,7 @@ function handleError(error, response) {
 export function handler(request, response) {
   const { method, url } = request
   let [_, route] = url.split("/")
-  route = route.includes(".") ? `file:${method}` : `${route}:${method}`
+  route = url.includes(".") ? `file:${method}` : `${route}:${method}`
   const routeKey = route.toLowerCase()
   const routeChosen = routes[routeKey] || routes.default
 
