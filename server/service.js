@@ -21,8 +21,6 @@ export class Service {
     this.currentBitrate = 0
     this.throttleTransform = {}
     this.currentReadable = {}
-
-    this.startStreaming()
   }
 
   createClientStream() {

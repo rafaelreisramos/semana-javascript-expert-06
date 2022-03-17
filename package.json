@@ -7,10 +7,15 @@
   "scripts": {
     "start": "node server/index.js",
     "live-reload": "npx nodemon server/index.js",
-    "test": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache",
-    "test:watch": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache --watchAll",
-    "test:coverage": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache --coverage tests/unit",
-    "live-reload:docker": "docker compose up --build live-reload"
+    "test": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache --detectOpenHandles",
+    "test:watch": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache --detectOpenHandles --watchAll",
+    "test:coverage": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache --detectOpenHandles --coverage tests/unit",
+    "test:e2e": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache --detectOpenHandles tests/e2e",
+    "live-reload:docker": "docker compose up --build live-reload",
+    "test:docker": "docker compose up --build test",
+    "test:watch:docker": "docker compose up --build test-watch",
+    "test:coverage:docker": "docker compose up --build test-coverage",
+    "test:e2e:docker": "docker compose up --build test-e2e"
   },
   "engines": {
     "node": "17"
@@ -20,7 +25,9 @@
   "license": "ISC",
   "devDependencies": {
     "jest": "^27.5.1",
-    "nodemon": "^2.0.15"
+    "nodemon": "^2.0.15",
+    "portfinder": "^1.0.28",
+    "supertest": "^6.2.2"
   },
   "dependencies": {
     "pino": "^7.8.0",
