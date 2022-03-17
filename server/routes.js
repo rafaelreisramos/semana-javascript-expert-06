@@ -1,6 +1,7 @@
 import config from "./config.js"
 import { logger } from "./util.js"
 import { Controller } from "./controller.js"
+import { once } from "events"
 
 const controller = new Controller()
 
@@ -25,6 +26,23 @@ const routes = {
 
   "controller:get": async (_, response) => {
     const { stream } = await controller.getFileStream(pages.controller)
+    return stream.pipe(response)
+  },
+
+  "controller:post": async (request, response) => {
+    const data = await once(request, "data")
+    const item = JSON.parse(data)
+    const result = await controller.handleCommand(item)
+    return response.end(JSON.stringify(result))
+  },
+
+  "stream:get": async (request, response) => {
+    const { stream, onClose } = controller.createClientStream()
+    request.once("close", onClose)
+    response.writeHead(200, {
+      "Content-Type": "audio/mpeg",
+      "Accept-Rages": "bytes",
+    })
     return stream.pipe(response)
   },
 
@@ -61,8 +79,11 @@ function handleError(error, response) {
 export function handler(request, response) {
   const { method, url } = request
   let [_, route] = url.split("/")
-  route = url.includes(".") ? `file:${method}` : `${route}:${method}`
+  route = `${route}:${method}`
+  route = url.includes("stream") ? `stream:${method}` : route
+  route = url.includes(".") ? `file:${method}` : route
   const routeKey = route.toLowerCase()
+  logger.info({ route })
   const routeChosen = routes[routeKey] || routes.default
 
   return routeChosen(request, response).catch((error) =>

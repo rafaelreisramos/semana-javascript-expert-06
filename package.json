@@ -9,7 +9,8 @@
     "live-reload": "npx nodemon server/index.js",
     "test": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache",
     "test:watch": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache --watchAll",
-    "test:coverage": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache --coverage tests/unit"
+    "test:coverage": "LOG_DISABLED=true NODE_OPTIONS=--experimental-vm-modules jest --no-cache --coverage tests/unit",
+    "live-reload:docker": "docker compose up --build live-reload"
   },
   "engines": {
     "node": "17"
@@ -23,6 +24,7 @@
   },
   "dependencies": {
     "pino": "^7.8.0",
-    "pino-pretty": "^7.5.3"
+    "pino-pretty": "^7.5.3",
+    "throttle": "^1.0.3"
   }
 }
