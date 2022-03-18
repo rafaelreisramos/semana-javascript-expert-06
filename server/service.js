@@ -83,7 +83,11 @@ export class Service {
     const songReadable = (this.currentReadable = this.createFileStream(
       this.currentSong
     ))
-    streamPromises.pipeline(songReadable, throttleTransform, this.broadcast())
+    return streamPromises.pipeline(
+      songReadable,
+      throttleTransform,
+      this.broadcast()
+    )
   }
 
   async stopStreaming() {
