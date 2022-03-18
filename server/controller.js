@@ -12,16 +12,16 @@ export class Controller {
 
   async handleCommand({ command }) {
     logger.info(`Command received: ${command}`)
-    const result = { result: "ok" }
     const cmd = command.toLowerCase()
     if (cmd.includes("start")) {
       this.service.startStreaming()
-      return result
+      return { result: command }
     }
     if (cmd.includes("stop")) {
       this.service.stopStreaming()
-      return result
+      return { result: command }
     }
+    return { result: "command not found!" }
   }
 
   createClientStream() {
