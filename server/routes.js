@@ -41,7 +41,7 @@ const routes = {
     request.once("close", onClose)
     response.writeHead(200, {
       "Content-Type": "audio/mpeg",
-      "Accept-Rages": "bytes",
+      "Accept-Ranges": "bytes",
     })
     return stream.pipe(response)
   },
