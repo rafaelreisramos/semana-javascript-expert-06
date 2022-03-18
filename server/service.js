@@ -64,7 +64,7 @@ export class Service {
     return new Writable({
       write: (chunk, enc, cb) => {
         for (const [id, stream] of this.clientStreams) {
-          if (stream.writableEnd) {
+          if (stream.writableEnded) {
             this.clientStreams.delete(id)
             continue
           }
@@ -90,8 +90,8 @@ export class Service {
     )
   }
 
-  async stopStreaming() {
-    this.throttleTransform?.end()
+  stopStreaming() {
+    this.throttleTransform?.end?.()
   }
 
   async getFileInfo(filename) {
