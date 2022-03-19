@@ -21,7 +21,12 @@ export class Controller {
       this.service.stopStreaming()
       return { result: command }
     }
-    return { result: "command not found!" }
+
+    const chosenSong = await this.service.readFxByName(command)
+    logger.info(`added to fx service: ${chosenSong}`)
+    this.service.appendFxStream(chosenSong)
+
+    return { result: `${command} success` }
   }
 
   createClientStream() {

@@ -48,22 +48,7 @@ describe("Controller", () => {
     })
   })
 
-  it("should return command not found on inexistent command", async () => {
-    const controller = new Controller()
-    jest
-      .spyOn(Service.prototype, Service.prototype.startStreaming.name)
-      .mockResolvedValue()
-    jest
-      .spyOn(Service.prototype, Service.prototype.stopStreaming.name)
-      .mockResolvedValue()
-    const result = await controller.handleCommand({ command: "inexistent" })
-
-    expect(Service.prototype.startStreaming).not.toHaveBeenCalled()
-    expect(Service.prototype.stopStreaming).not.toHaveBeenCalled()
-    expect(result).toStrictEqual({
-      result: "command not found!",
-    })
-  })
+  it.todo("should append fx to stream")
 
   it("should create a clientStream", async () => {
     const controller = new Controller()

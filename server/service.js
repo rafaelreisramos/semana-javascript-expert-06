@@ -10,8 +10,15 @@ import config from "./config.js"
 import { logger } from "./util.js"
 
 const {
-  dir: { publicDir },
-  constants: { fallbackBitRate, bitrateDivisor, englishConversation },
+  dir: { publicDir, fx: fxDir },
+  constants: {
+    fallbackBitRate,
+    bitrateDivisor,
+    englishConversation,
+    audioMediaType,
+    songVolume,
+    fxVolume,
+  },
 } = config
 
 export class Service {
@@ -110,5 +117,63 @@ export class Service {
       stream: this.createFileStream(name),
       type,
     }
+  }
+
+  async readFxByName(fxName) {
+    const songs = await fs.promises.readdir(fxDir)
+    const chosenSong = songs.find((filename) =>
+      filename.toLowerCase().includes(fxName)
+    )
+    if (!chosenSong) return Promise.reject(`the song ${fxName} wasn't found!`)
+    return join(fxDir, chosenSong)
+  }
+
+  appendFxStream(fx) {
+    const throttleTransformable = new Throttle(this.currentBitrate)
+    streamPromises.pipeline(throttleTransformable, this.broadcast())
+
+    const unpipe = () => {
+      const transformStream = this.mergeAudioStream(fx, this.currentReadable)
+      this.throttleTransform = throttleTransformable
+      this.currentReadable = transformStream
+      this.currentReadable.removeListener("unpipe", unpipe)
+      streamPromises.pipeline(transformStream, throttleTransformable)
+    }
+
+    this.throttleTransform.on("unpipe", unpipe)
+    this.throttleTransform.pause()
+    this.currentReadable.unpipe(this.throttleTransform)
+  }
+
+  mergeAudioStream(song, readable) {
+    const transformStream = new PassThrough()
+    const args = [
+      "-t",
+      audioMediaType,
+      "-v",
+      songVolume,
+      "-m",
+      "-", // -m => merge, '-' means receive as stream
+      "-t",
+      audioMediaType,
+      "-v",
+      fxVolume,
+      song,
+      "-t",
+      audioMediaType,
+      "-",
+    ]
+    const { stdout, stdin } = this._executeSoxCommand(args)
+    // our conversations stream is plugged to terminal stdin
+    streamPromises.pipeline(readable, stdin)
+    // .catch((error) =>
+    //   logger.error(`error on sending stream to sox: ${error}`)
+    // )
+    streamPromises.pipeline(stdout, transformStream)
+    // .catch((error) =>
+    //   logger.error(`error on receiving stream from sox: ${error}`)
+    // )
+
+    return transformStream
   }
 }
