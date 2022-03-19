@@ -83,7 +83,6 @@ export function handler(request, response) {
   route = url.includes("stream") ? `stream:${method}` : route
   route = url.includes(".") ? `file:${method}` : route
   const routeKey = route.toLowerCase()
-  logger.info({ route })
   const routeChosen = routes[routeKey] || routes.default
 
   return routeChosen(request, response).catch((error) =>
