@@ -1,18 +1,81 @@
 import { jest, describe, expect, test, beforeEach, it } from "@jest/globals"
 import supertest from "supertest"
 import portfinder from "portfinder"
+import fs from "fs"
 import { Transform } from "stream"
 import { setTimeout } from "timers/promises"
 import Server from "../../../server/server.js"
+import config from "./../../../server/config.js"
 
+const {
+  dir: { publicDir },
+  pages: { home, controller },
+  files: { html, css, script },
+} = config
 const getAvailablePort = portfinder.getPortPromise
 const RETENTION_DATA_PERIOD = 200
+let testServer = supertest(Server())
+const commands = { start: "start", stop: "stop" }
 
 describe("API E2E Suite Test", () => {
-  const commandResponse = JSON.stringify({ result: "ok" })
-  const commands = { start: "start", stop: "stop" }
+  describe("Routes", () => {
+    it("should respond with 404 status code given an unknown route", async () => {
+      const response = await testServer.get(`/unknown`)
+      expect(response.statusCode).toStrictEqual(404)
+    })
 
-  describe("client workflow", () => {
+    it("should respond with the home location and 302 status code given / route", async () => {
+      const response = await testServer.get("/")
+      expect(response.headers.location).toStrictEqual("/home")
+      expect(response.statusCode).toStrictEqual(302)
+    })
+
+    it("should respond with file stream given /home", async () => {
+      const response = await testServer.get("/home")
+      const homePage = await fs.promises.readFile(`${publicDir}/${home}`)
+      expect(response.text).toStrictEqual(homePage.toString())
+    })
+
+    it("should respond with file stream given /controller", async () => {
+      const response = await testServer.get("/controller")
+      const homePage = await fs.promises.readFile(`${publicDir}/${controller}`)
+      expect(response.text).toStrictEqual(homePage.toString())
+    })
+  })
+
+  describe("GET static files", () => {
+    it("should respond with 404 if file doesnt exists", async () => {
+      const file = "missing-file.js"
+      const response = await testServer.get(`/${file}`)
+      expect(response.statusCode).toStrictEqual(404)
+    })
+
+    it("should respond with content-type text/css given a css file", async () => {
+      const response = await testServer.get(`/${css}`)
+      const content = await fs.promises.readFile(`${publicDir}/${css}`)
+      expect(response.text).toStrictEqual(content.toString())
+      expect(response.statusCode).toStrictEqual(200)
+      expect(response.header["content-type"]).toStrictEqual("text/css")
+    })
+
+    it("should respond with content-type text/javascript given a js file", async () => {
+      const response = await testServer.get(`/${script}`)
+      const content = await fs.promises.readFile(`${publicDir}/${script}`)
+      expect(response.text).toStrictEqual(content.toString())
+      expect(response.statusCode).toStrictEqual(200)
+      expect(response.header["content-type"]).toStrictEqual("text/javascript")
+    })
+
+    it("should respond with content-type text/html given a html file", async () => {
+      const response = await testServer.get(`/${html}`)
+      const content = await fs.promises.readFile(`${publicDir}/${html}`)
+      expect(response.text).toStrictEqual(content.toString())
+      expect(response.statusCode).toStrictEqual(200)
+      expect(response.header["content-type"]).toStrictEqual("text/html")
+    })
+  })
+
+  describe("Client workflow", () => {
     function pipeAndReadStreamData(stream, onChunk) {
       const transform = new Transform({
         transform(chunk, enc, cb) {
@@ -50,7 +113,9 @@ describe("API E2E Suite Test", () => {
             .post("/controller")
             .send({ command })
 
-          expect(response.text).toStrictEqual(commandResponse)
+          expect(response.text).toStrictEqual(
+            JSON.stringify({ result: command })
+          )
         },
       }
     }

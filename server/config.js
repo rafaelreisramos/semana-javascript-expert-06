@@ -20,6 +20,11 @@ export default {
     home: "home/index.html",
     controller: "controller/index.html",
   },
+  files: {
+    script: "home/js/animation.js",
+    css: "controller/css/index.css",
+    html: "controller/index.html",
+  },
   location: {
     home: "/home",
   },
