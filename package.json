@@ -8,7 +8,7 @@
     "start": "node server/index.js",
     "live-reload": "npx nodemon server/index.js",
     "test": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache --force-exit --detectOpenHandles",
-    "test:watch": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache force-exit --detectOpenHandles --watchAll",
+    "test:watch": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache --detectOpenHandles --watchAll",
     "test:coverage": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache --force-exit --detectOpenHandles --coverage tests/unit",
     "test:e2e": "LOG_DISABLED=true NODE_OPTIONS='--experimental-vm-modules --no-warnings' npx jest --no-cache --force-exit --detectOpenHandles tests/e2e",
     "live-reload:docker": "docker compose up --build live-reload",
