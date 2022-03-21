@@ -48,7 +48,22 @@ describe("Controller", () => {
     })
   })
 
-  it.todo("should append fx to stream")
+  it("should read song and append it as fx to stream", async () => {
+    const controller = new Controller()
+
+    const fxSound = "fxSound"
+    const readFx = jest
+      .spyOn(Service.prototype, Service.prototype.readFxByName.name)
+      .mockResolvedValue(fxSound)
+    const applyFx = jest
+      .spyOn(Service.prototype, Service.prototype.appendFxStream.name)
+      .mockReturnValue()
+    const result = await controller.handleCommand({ command: fxSound })
+
+    expect(readFx).toHaveBeenCalled()
+    expect(applyFx).toHaveBeenCalledWith(fxSound)
+    expect(result).toStrictEqual({ result: `${fxSound} success` })
+  })
 
   it("should create a clientStream", async () => {
     const controller = new Controller()

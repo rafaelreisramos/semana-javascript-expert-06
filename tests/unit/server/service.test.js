@@ -7,9 +7,17 @@ import { Service } from "../../../server/service"
 import TestUtil from "../_util/testUtil"
 import config from "../../../server/config.js"
 import { PassThrough, Writable } from "stream"
+import path from "path"
 
 const {
-  constants: { fallbackBitRate, bitrateDivisor },
+  constants: {
+    fallbackBitRate,
+    bitrateDivisor,
+    audioMediaType,
+    songVolume,
+    fxVolume,
+  },
+  dir: { rootDir, fx: fxDir },
 } = config
 
 describe("#Service", () => {
@@ -167,6 +175,116 @@ describe("#Service", () => {
       currentReadable,
       service.throttleTransform,
       service.broadcast()
+    )
+  })
+
+  it("should return a chosen song based on fx command sent", async () => {
+    const service = new Service()
+    const fxName = "songB".toLowerCase()
+    const fxSounds = ["songA is awesome.mp3", "bad songB.mp3"]
+    const readDir = jest
+      .spyOn(fs.promises, fs.promises.readdir.name)
+      .mockResolvedValue(fxSounds)
+    jest
+      .spyOn(path, path.join.name)
+      .mockReturnValue(`${rootDir}/audio/fx/'bad songB.mp3'`)
+
+    const chosenFx = await service.readFxByName(fxName)
+
+    expect(readDir).toHaveBeenCalledWith(fxDir)
+    expect(chosenFx).toStrictEqual(`${chosenFx}`)
+  })
+
+  it("should return an error if fx sound wasn't found", async () => {
+    const service = new Service()
+    const fxName = "songC".toLowerCase()
+    const fxSounds = ["songA is awesome.mp3", "bad songB.mp3"]
+    const readDir = jest
+      .spyOn(fs.promises, fs.promises.readdir.name)
+      .mockResolvedValue(fxSounds)
+
+    expect(service.readFxByName(fxName)).rejects.toEqual(
+      `the song ${fxName} wasn't found!`
+    )
+    expect(readDir).toHaveBeenCalledWith(fxDir)
+  })
+
+  it("should merge audio stream", () => {
+    const service = new Service()
+    const readable = TestUtil.generateReadableStream()
+    const spawnResponse = TestUtil.getSpawnResponse({
+      stdout: "song+fx",
+      stdin: "fx",
+    })
+    jest
+      .spyOn(service, service._executeSoxCommand.name)
+      .mockReturnValue(spawnResponse)
+    jest.spyOn(streamPromises, streamPromises.pipeline.name).mockResolvedValue()
+
+    const fxSound = "songA.mp3"
+    const args = [
+      "-t",
+      audioMediaType,
+      "-v",
+      songVolume,
+      "-m",
+      "-",
+      "-t",
+      audioMediaType,
+      "-v",
+      fxVolume,
+      fxSound,
+      "-t",
+      audioMediaType,
+      "-",
+    ]
+
+    const transformStream = service.mergeAudioStream(fxSound, readable)
+    const [_, call2] = streamPromises.pipeline.mock.calls
+    const [stdoutCall, __] = call2
+
+    expect(service._executeSoxCommand).toHaveBeenCalledWith(args)
+    expect(streamPromises.pipeline).toHaveBeenCalledTimes(2)
+    expect(streamPromises.pipeline).toHaveBeenNthCalledWith(
+      1,
+      readable,
+      spawnResponse.stdin
+    )
+    expect(stdoutCall).toStrictEqual(spawnResponse.stdout)
+    expect(transformStream).toBeInstanceOf(PassThrough)
+  })
+
+  it("should append a fx stream to current stream", () => {
+    const service = new Service()
+    const fx = "fxSound.mp3"
+    const bps = 1000
+    service.throttleTransform = new Throttle(bps)
+    service.currentReadable = TestUtil.generateReadableStream(["stream"])
+    const mergedThrottleTransform = new PassThrough()
+    jest.spyOn(streamPromises, streamPromises.pipeline.name).mockResolvedValue()
+    jest.spyOn(service.throttleTransform, "pause").mockReturnValue()
+    jest.spyOn(service.throttleTransform, "unpipe").mockReturnValue()
+    jest.spyOn(service.currentReadable, "unpipe").mockReturnValue()
+    jest
+      .spyOn(service, service.mergeAudioStream.name)
+      .mockReturnValue(mergedThrottleTransform)
+    jest.spyOn(mergedThrottleTransform, "removeListener").mockReturnValue()
+
+    service.appendFxStream(fx)
+
+    expect(service.throttleTransform.pause).toHaveBeenCalled()
+    expect(service.currentReadable.unpipe).toHaveBeenCalledWith(
+      service.throttleTransform
+    )
+
+    service.throttleTransform.emit("unpipe")
+
+    expect(mergedThrottleTransform.removeListener).toHaveBeenCalled()
+    expect(streamPromises.pipeline).toHaveBeenCalledTimes(2)
+    expect(streamPromises.pipeline).toHaveBeenNthCalledWith(
+      2,
+      mergedThrottleTransform,
+      service.throttleTransform
     )
   })
 })
