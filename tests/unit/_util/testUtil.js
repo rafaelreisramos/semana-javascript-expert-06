@@ -43,11 +43,7 @@ export default class TestUtil {
     }
   }
 
-  static getSpawnResponse = ({
-    stdout = "",
-    stderr = "",
-    stdin = () => {},
-  }) => ({
+  static getSpawnResponse = ({ stdout = "", stderr = "", stdin = "" }) => ({
     stdout: this.generateReadableStream([stdout]),
     stderr: this.generateReadableStream([stderr]),
     stdin: this.generateWritableStream(stdin),
