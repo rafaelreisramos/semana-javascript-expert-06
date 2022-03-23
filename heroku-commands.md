@@ -24,12 +24,14 @@ run:
   - `heroku login`
 - create heroku app
   - `heroku apps:create rafaelreisramos-spotify-radio`
+- add heroku remote repository
+  - `git remote add heroku https://git.heroku.com/rafaelreisramos-spotify-radio.git`
 - check remote git repository
   - `git remote -v`
-- push git repository to heroku
-  - `git push -u heroku main`
 - deploy our app as a container
   - `heroku stack:set container`
+- push git repository to heroku
+  - `git push -u heroku main`
 
 ## Starting Our App
 
