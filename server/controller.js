@@ -26,7 +26,7 @@ export class Controller {
     logger.info(`added to fx service: ${chosenSong}`)
     this.service.appendFxStream(chosenSong)
 
-    return { result: `${command} success` }
+    return { result: `${command}` }
   }
 
   createClientStream() {

@@ -62,7 +62,7 @@ describe("Controller", () => {
 
     expect(readFx).toHaveBeenCalled()
     expect(applyFx).toHaveBeenCalledWith(fxSound)
-    expect(result).toStrictEqual({ result: `${fxSound} success` })
+    expect(result).toStrictEqual({ result: `${fxSound}` })
   })
 
   it("should create a clientStream", async () => {
