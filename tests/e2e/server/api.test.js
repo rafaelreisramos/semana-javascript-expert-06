@@ -1,4 +1,4 @@
-import { jest, describe, expect, test, beforeEach, it } from "@jest/globals"
+import { jest, describe, expect, afterEach, it } from "@jest/globals"
 import supertest from "supertest"
 import portfinder from "portfinder"
 import fs from "fs"
@@ -15,10 +15,22 @@ const {
 const getAvailablePort = portfinder.getPortPromise
 const RETENTION_DATA_PERIOD = 200
 let testServer = supertest(Server())
-const commands = { start: "start", stop: "stop" }
+const commands = {
+  start: "start",
+  stop: "stop",
+  applause: "applause",
+  audience: "audience",
+  boo: "boo",
+  fart: "fart",
+  laughing: "laughing",
+}
 
 describe("API E2E Suite Test", () => {
   describe("Routes", () => {
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+
     it("should respond with 404 status code given an unknown route", async () => {
       const response = await testServer.get(`/unknown`)
       expect(response.statusCode).toStrictEqual(404)
@@ -114,7 +126,7 @@ describe("API E2E Suite Test", () => {
             .send({ command })
 
           expect(response.text).toStrictEqual(
-            JSON.stringify({ result: command })
+            JSON.stringify({ result: `${command}` })
           )
         },
       }
@@ -142,6 +154,44 @@ describe("API E2E Suite Test", () => {
 
       expect(buffer).toBeInstanceOf(Buffer)
       expect(buffer.length).toBeGreaterThan(1000)
+
+      server.kill()
+    })
+
+    it("should send all commands and don't break the api", async () => {
+      const server = await getTestServer()
+      const onChunk = jest.fn()
+      const { send } = commandSender(server.testServer)
+      pipeAndReadStreamData(server.testServer.get("/stream"), onChunk)
+      await send(commands.start)
+      await setTimeout(RETENTION_DATA_PERIOD)
+      const fxCommands = Object.keys(commands).filter(
+        (fxCommand) =>
+          fxCommand !== commands.start || fxCommand !== commands.stop
+      )
+      for (const fxCommand of fxCommands) {
+        await send(fxCommand)
+        await setTimeout(RETENTION_DATA_PERIOD)
+      }
+      await send(commands.stop)
+
+      const NUM_OF_FXSOUNDS = 5
+      const [[buffer]] = onChunk.mock.calls
+      expect(onChunk.mock.calls.length).toBeGreaterThanOrEqual(NUM_OF_FXSOUNDS)
+      expect(buffer).toBeInstanceOf(Buffer)
+      expect(buffer.length).toBeGreaterThan(1000)
+
+      server.kill()
+    })
+
+    it("should not break the API when sending commands and no audio is playing", async () => {
+      const server = await getTestServer()
+      const { send } = commandSender(server.testServer)
+
+      await send(commands.stop)
+      await send(commands.applause)
+      await send(commands.stop)
+      await setTimeout(RETENTION_DATA_PERIOD)
 
       server.kill()
     })
