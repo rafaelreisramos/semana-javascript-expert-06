@@ -10,8 +10,8 @@ Projeto desenvolvido na Semana Javascript Expert.
 
 - Web API
 
-  - [ ] Deve atingir 100% de cobertura de código em testes
-  - [ ] Deve ter testes de integração validando todas as rotas da API
+  - [x] Deve atingir 100% de cobertura de código em testes
+  - [x] Deve ter testes de integração validando todas as rotas da API
   - [x] Deve entregar arquivos estáticos como Node.js Stream
   - [x] Deve entregar arquivos de música como Node.js Stream
   - [x] Dado um usuário desconectado, não deve quebrar a API
@@ -30,12 +30,12 @@ Projeto desenvolvido na Semana Javascript Expert.
 
 ## Tarefas a fazer
 
-- [ ] implementar testes unitários para o frontend e manter 100% de code coverage
+- [x] implementar testes unitários para o frontend e manter 100% de code coverage
 - **PLUS**:
-  - [ ] disponibilizar um novo efeito
-    - [ ] adicionar um botão novo no controlador
-    - [ ] adicionar um som de efeito novo para a pasta `audios/fx/`
-    - [ ] republicar no heroku
+  - [x] disponibilizar um novo efeito
+    - [x] adicionar um botão novo no controlador
+    - [x] adicionar um som de efeito novo para a pasta `audios/fx/`
+    - [x] republicar no heroku
 
 ### Créditos aos áudios usados
 
@@ -50,3 +50,4 @@ Projeto desenvolvido na Semana Javascript Expert.
 - [Boo](https://youtu.be/rYAQN11a2Dc)
 - [Fart](https://youtu.be/4PnUfYhbDDM)
 - [Laugh](https://youtu.be/TZ90IUrMNCo)
+- [Cartoon Running](https://youtu.be/igSHbtv52G4)
