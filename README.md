@@ -1,6 +1,13 @@
 # Spotify Radio - Semana JS Expert 6.0
 
-Projeto desenvolvido na Semana Javascript Expert.
+Projeto desenvolvido na Semana Javascript Expert ministrada pelo mestre
+[Erick Wendel](https://cursos.erickwendel.com.br/).
+
+## O Projeto
+
+O projeto é um Stream Deck que permite inserir efeitos sonoros em um streaming de áudio.
+
+É composto basicamente de um player de áudio e o controlador, ou o stream deck, propriamente dito.
 
 ## Preview
 
@@ -36,6 +43,47 @@ Projeto desenvolvido na Semana Javascript Expert.
     - [x] adicionar um botão novo no controlador
     - [x] adicionar um som de efeito novo para a pasta `audios/fx/`
     - [x] republicar no heroku
+
+## Mas, e aí, como testar o projeto?
+
+Para testar o projeto é necessário você instalar o [docker compose](https://docs.docker.com/compose/install/)
+na sua máquina.
+
+A instalação é necessária porque o ambiente do projeto usa o [SoX](http://sox.sourceforge.net/),
+que precisa ser instalado na máquina para permitir a manipulação do áudio pelo controlador.
+
+Para que não seja necessária a instalação na máquina, que acaba ficando dependende do Sistema
+Operacional usado, e pode gerar diferenças no comportamento, é preferível rodar o projeto em um
+container.
+
+Para rodar o projeto siga os seguintes passos:
+
+- clone este repositório ou o original do [Github do próprio
+  Erick Wendel](https://github.com/ErickWendel/semana-javascript-expert06).
+
+`git clone https://github.com/rafaelreisramos/semana-javascript-expert-06`
+
+- Instale as dependências com o npm
+
+`npm i --silent`
+
+- Como o docker compose já instalado, execute
+
+`npm run live-reload:docker`
+
+Verifique se no console aparece o log do servidor rodando. Em caso positivo acesse os endereços
+`localhost:3000/home` e em uma outra aba do navegador `localhost:3000/controller`.
+
+_Importante_: Na página `home` de um play para iniciar o streaming de áudio. Este passo
+é necessário porque o Chrome e/ou Firefox não vem mais com o autoplay habilitado por padrão.
+
+Agora acione os efeitos no stream deck na página `controller` e ouça o resultado.
+
+Como dito pelo mestre, o resultado não é prefeito e pode ser melhorado mas já nos mostra
+o poder da manipulação dos streamings em tempo real.
+
+Se você quiser fazer [deploy no Heroku](https://www.heroku.com/) siga as instruções do arquivo
+`heroku-commands.md`, substituindo o meu nome nos comandos de criação do pelo seu ;-).
 
 ### Créditos aos áudios usados
 
